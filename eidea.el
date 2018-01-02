@@ -38,6 +38,17 @@
 (defconst eidea/solution-prediction "SOLUTION")
 (defconst eidea/testset-prediction "TESTSET")
 
+(defvar eidea-mode-map
+  (let ((map (make-sparse-keymap)))
+    (suppress-keymap map t)
+    (define-key map "g" 'eidea/show)
+    (define-key map "q" 'eidea/close-then-delete)
+    map))
+
+(define-derived-mode eidea-mode
+  org-mode "EIdea"
+  "Major mode for eidea.")
+
 (defun eidea/close-then-delete ()
   "Close the WINDOW then delete it."
   (interactive)
@@ -50,7 +61,7 @@
   (switch-to-buffer eidea/buffer)
   (erase-buffer)
   (setq org-confirm-elisp-link-function nil)
-  (org-mode)
+  (eidea-mode)
 
   (insert "[[elisp:(eidea/clean-workspace)][Clean workspace]]\n\n")
   (insert "|--\n")
@@ -96,9 +107,7 @@
   (if (get-buffer eidea/buffer) (eidea/close-then-delete))
   (split-window-horizontally)
   (generate-new-buffer eidea/buffer)
-  (eidea/render-buffer)
-  (local-set-key (kbd "q") 'eidea/close-then-delete)
-  (local-set-key (kbd "g") 'eidea/show))
+  (eidea/render-buffer))
 
 (defun eidea/show ()
   "Show the eidea pane."
