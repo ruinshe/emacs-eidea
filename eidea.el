@@ -4,7 +4,7 @@
 
 ;; Author: Ruins He <lyhypacm@gmail.com>
 ;; URL: https://github.com/ruinshe/emacs-eidea
-;; Version: 0.1
+;; Version: 0.2
 ;; Package-Requires: (org, multi-term)
 
 ;;; Commentary:
@@ -84,7 +84,10 @@
                         "|" problem-folder-name
                         "|" (number-to-string solutions)
                         "|[[elisp:(eidea/problem-build \""
-                        problem-folder-name "\")][Build]]|\n")
+                        problem-folder-name "\")][Build]] / "
+                        "[[elisp:(eidea/problem-test \""
+                        problem-folder-name "\")][Test]]"
+                        "|\n")
                 (dolist (subdir subdirs)
                   (if (file-exists-p
                        (expand-file-name eidea/solution-prediction subdir))
@@ -137,6 +140,11 @@
   "Build specific PROBLEM."
   (interactive)
   (eidea/run-rime-command (concat "build " problem)))
+
+(defun eidea/problem-test (problem)
+  "Build specific PROBLEM."
+  (interactive)
+  (eidea/run-rime-command (concat "test " problem)))
 
 (defun eidea/add-solution (problem-folder)
   "Add solution in PROBLEM-FOLDER."

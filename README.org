@@ -1,0 +1,23 @@
+* emacs-eidea
+Emacs &amp; Rime integration
+
+*** Install
+Clone this git repository, and load the lisp file from cloned folder.
+
+#+BEGIN_SRC shell
+git clone https://github.com/ruinshe/emacs-eidea.git
+cd emacs-eidea
+echo "(load \"$(pwd)/eidea.el\")" >> ~/.emacs.d/init.el
+#+END_SRC
+
+*** Workspace configuration
+Before using, please set =eidea/workdir= variable, by =M-x customize=, and find
+the group =eidea= or variable =eidea/workdir=.
+
+*** Key binding
+
+Only =keymap= need to be binded is =eidea/show=.
+
+#+BEGIN_SRC elisp
+(global-set-key (kbd "C-C r") 'eidea/show)
+#+END_SRC
