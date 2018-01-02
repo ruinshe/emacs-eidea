@@ -1,5 +1,5 @@
 * emacs-eidea
-Emacs &amp; Rime integration
+Emacs & Rime integration
 
 *** Install
 Clone this git repository, and load the lisp file from cloned folder.
