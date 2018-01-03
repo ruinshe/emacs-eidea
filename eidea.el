@@ -52,7 +52,7 @@
 (defun eidea/close-then-delete ()
   "Close the WINDOW then delete it."
   (interactive)
-  (delete-window)
+  (switch-to-buffer eidea/buffer)
   (kill-buffer eidea/buffer))
 
 (defun eidea/render-buffer ()
@@ -108,7 +108,6 @@
   "Create a new buffer to list all problems."
   (interactive)
   (if (get-buffer eidea/buffer) (eidea/close-then-delete))
-  (split-window-horizontally)
   (generate-new-buffer eidea/buffer)
   (eidea/render-buffer))
 
