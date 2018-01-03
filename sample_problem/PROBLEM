@@ -1,0 +1,10 @@
+# -*- coding: utf-8; mode: python -*-
+
+pid = 'A'
+
+problem(
+    time_limit=1.0,
+    id=pid,
+    title="A + B problem",
+    reference_solution='sol_ruins',
+)
