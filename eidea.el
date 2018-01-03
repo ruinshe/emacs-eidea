@@ -4,7 +4,7 @@
 
 ;; Author: Ruins He <lyhypacm@gmail.com>
 ;; URL: https://github.com/ruinshe/emacs-eidea
-;; Version: 0.2
+;; Version: 0.3
 ;; Package-Requires: (org, multi-term)
 
 ;;; Commentary:
@@ -64,8 +64,9 @@
   (eidea-mode)
 
   (insert "[[elisp:(eidea/clean-workspace)][Clean workspace]]\n\n")
+  (insert "Use =g= command to refresh this buffer.\n\n")
   (insert "|--\n")
-  (insert "|#|Directory|Solutions|Invocations|\n")
+  (insert "|#|Problem|Solutions and tests|Invocations|\n")
   (insert "|--\n")
   (let ((problem-files (directory-files eidea/workdir t)) (counter 0))
     (dolist (problem-folder problem-files)
@@ -75,31 +76,56 @@
                  (file-name-nondirectory problem-folder)))
             (progn
               (setq counter (1+ counter))
-              (let ((subdirs (directory-files problem-folder t)) (solutions 0))
+              (let ((subdirs (directory-files problem-folder t)) (solutions 0) (tests 0))
+                ;; calculation
                 (dolist (subdir subdirs)
                   (if (file-exists-p
                        (expand-file-name eidea/solution-prediction subdir))
-                      (setq solutions (1+ solutions))))
+                      (setq solutions (1+ solutions)))
+                  (if (file-exists-p
+                       (expand-file-name eidea/testset-prediction subdir))
+                      (setq tests (1+ tests)))
+                  )
+
+                ;; problem header
                 (insert "|" (number-to-string counter)
-                        "|" problem-folder-name
-                        "|" (number-to-string solutions)
-                        "|[[elisp:(eidea/problem-build \""
+                        "|" (eidea/extract-problem-name problem-folder)
+                        "||[[elisp:(find-file \""
+                        (expand-file-name eidea/problem-prediction problem-folder)
+                        "\")][Config]] / [[elisp:(eidea/problem-build \""
                         problem-folder-name "\")][Build]] / "
                         "[[elisp:(eidea/problem-test \""
                         problem-folder-name "\")][Test]]"
                         "|\n")
+                (insert "|--\n")
+                
+                ;; solutions
+                (insert "|||" (number-to-string solutions) " solution(s)\n")
                 (dolist (subdir subdirs)
                   (if (file-exists-p
                        (expand-file-name eidea/solution-prediction subdir))
                       (insert "|||" (file-name-nondirectory subdir) "|"
                               "[[elisp:(find-file \""
                               (expand-file-name eidea/solution-prediction subdir)
-                              "\")][Edit]]|\n")))
+                              "\")][Config]] / [[elisp:(find-file \"" subdir "\")][Folder]]|"
+                              "\n")))
                 (insert "|||[[elisp:(eidea/add-solution \""
-                        problem-folder "\")][Add solution]]"
-                        "|[[elisp:(eidea/add-testset \""
+                        problem-folder "\")][Add solution]]||\n")
+                (insert "|--\n")
+
+                ;; tests
+                (insert "|||" (number-to-string tests) " test(s)\n")
+                (dolist (subdir subdirs)
+                  (if (file-exists-p
+                       (expand-file-name eidea/testset-prediction subdir))
+                      (insert "|||" (file-name-nondirectory subdir) "|"
+                              "[[elisp:(find-file \""
+                              (expand-file-name eidea/testset-prediction subdir)
+                              "\")][Config]] / [[elisp:(find-file \"" subdir "\")][Folder]]|"
+                              "\n")))
+                (insert "|||[[elisp:(eidea/add-testset \""
                         problem-folder "\")][Add testset]]"
-                        "|\n")
+                        "||\n")
                 (insert "|--\n")))))))
   (org-table-align)
   (read-only-mode))
@@ -126,9 +152,9 @@
 
 (defun eidea/run-rime-command (command)
   "Run rime COMMAND."
-  (multi-term-prev)
-  (term-send-raw-string
-   (concat "cd " eidea/workdir " && rime " command "\n")))
+   (multi-term-prev)
+   (term-send-raw-string
+    (concat "cd " eidea/workdir " && rime " command "\n")))
 
 (defun eidea/clean-workspace ()
   "Clean the rime workspace."
@@ -166,6 +192,20 @@
          (concat "add "
                  (file-name-nondirectory problem-folder) " testset "
                  (file-name-nondirectory subdir)))))))
+
+(defun eidea/extract-problem-name (problem-folder)
+  "Extract the problem name of a problem located in PROBLEM-FOLDER."
+  (setq config-file (expand-file-name eidea/problem-prediction problem-folder))
+  (setq more-lines t)
+  (find-file config-file)
+  (goto-char 1)
+  (search-forward-regexp "title[ ]*=[ ]*\"" nil t)
+  (setq problem-name-start (point))
+  (search-forward "\"")
+  (setq problem-name-end (point))
+  (setq result (buffer-substring-no-properties problem-name-start (1- problem-name-end)))
+  (kill-buffer (current-buffer))
+  result)
 
 (provide 'eidea)
 ;;; eidea.el ends here
