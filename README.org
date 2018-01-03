@@ -2,7 +2,8 @@
 Emacs & Rime integration
 
 *** Install
-Clone this git repository, and load the lisp file from cloned folder.
+Clone this git repository, and load the lisp file from cloned folder, and you need to install [[https://github.com/icpc-jag/rime][Rime]]
+and make sure =org= and =multi-term= emacs package installed by yourself.
 
 #+BEGIN_SRC shell
 git clone https://github.com/ruinshe/emacs-eidea.git
@@ -10,14 +11,39 @@ cd emacs-eidea
 echo "(load \"$(pwd)/eidea.el\")" >> ~/.emacs.d/init.el
 #+END_SRC
 
+Or you can use the quick bootstrap script to install (only non Emacs user recommended):
+
+#+BEGIN_SRC shell
+./bootstrap.sh <workdir>
+#+END_SRC
+
 *** Workspace configuration
 Before using, please set =eidea/workdir= variable, by =M-x customize=, and find
 the group =eidea= or variable =eidea/workdir=.
 
+Or you can save the variable in your =emacs/init.el=.
+
+#+BEGIN_SRC emacs-lisp
+(setq eidea/workdir "path/to/your/workdir")
+#+END_SRC
+
 *** Key binding
+
+For non Emacs user: user =M-x eidea/show= to open dashboard, here =M= is =Meta= key (default =Alt=
+in Linux).
 
 Only =keymap= need to be binded is =eidea/show=.
 
 #+BEGIN_SRC elisp
 (global-set-key (kbd "C-C r") 'eidea/show)
 #+END_SRC
+
+*** Known but will not fix issues
+The title set in problem config should be formatted as
+
+#+BEGIN_SRC
+title = "problem name"
+#+END_SRC
+
+And the other title setting(s) like =pid + ": problem name"= is not acceptable and will not be
+supported.
