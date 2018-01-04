@@ -65,6 +65,7 @@
 
   (insert "[[elisp:(eidea/clean-workspace)][Clean workspace]]\n\n")
   (insert "Use =g= command to refresh this buffer.\n\n")
+  (insert "[[elisp:eidea/add-new-problem][Add new problem]]\n")
   (insert "|--\n")
   (insert "|#|Problem|Solutions and tests|Invocations|\n")
   (insert "|--\n")
@@ -154,7 +155,7 @@
   "Run rime COMMAND."
    (multi-term-prev)
    (term-send-raw-string
-    (concat "cd " eidea/workdir " && rime " command "\n")))
+    (concat "cd " eidea/workdir "; rime " command "\n")))
 
 (defun eidea/clean-workspace ()
   "Clean the rime workspace."
@@ -206,6 +207,29 @@
   (setq result (buffer-substring-no-properties problem-name-start (1- problem-name-end)))
   (kill-buffer (current-buffer))
   result)
+
+(defun eidea/add-new-problem ()
+  "Add a new problem, according to folder name and problem title."
+  (interactive)
+  (let ((problem-folder-name (read-string "Please enter the folder name of problem: ")))
+    (setq problem-folder (expand-file-name problem-folder-name eidea/workdir))
+    (if (file-exists-p problem-folder)
+        (error "The problem folder exists, please choose another name")
+      (progn
+        (make-directory problem-folder)
+        (setq config-file (expand-file-name eidea/problem-prediction problem-folder))
+        (find-file config-file)
+        (insert "# -*- coding: utf-8; mode: python -*-\npid = 'X'\n"
+                "problem(\n"
+                "    time_limit=1.0,\n"
+                "    id=pid,\n"
+                "    title=\"set problem title in your config file\",\n"
+                "    # reference_solution='',\n"
+                ")\n")
+        (save-buffer (current-buffer))
+        (kill-buffer (current-buffer))
+        (message "New problem %S created." problem-folder-name)
+        (eidea/show)))))
 
 (provide 'eidea)
 ;;; eidea.el ends here
